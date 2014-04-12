@@ -195,7 +195,9 @@ var Swiper = function (selector, params) {
         wrapperClass: 'swiper-wrapper',
         paginationElementClass: 'swiper-pagination-switch',
         paginationActiveClass: 'swiper-active-switch',
-        paginationVisibleClass: 'swiper-visible-switch'
+        paginationVisibleClass: 'swiper-visible-switch',
+
+        keepWidths: false
     };
     params = params || {};
     for (var prop in defaults) {
@@ -738,7 +740,7 @@ var Swiper = function (selector, params) {
                 if (params.roundLengths) slideHeight = Math.round(slideHeight);
                 wrapperHeight = isH ? _this.height : _this.slides.length * slideHeight;
             }
-            slideWidth = isH ? _this.width / params.slidesPerView : _this.width;
+            slideWidth = isH ? (params.keepWidths ? _this.slides[0].offsetWidth : _this.width) / params.slidesPerView : (params.keepWidths ? _this.slides[0].offsetWidth: _this.width);
             if (params.roundLengths) slideWidth = Math.round(slideWidth);
             wrapperWidth = isH ? _this.slides.length * slideWidth : _this.width;
             slideSize = isH ? slideWidth : slideHeight;
@@ -796,7 +798,9 @@ var Swiper = function (selector, params) {
                 slideLeft += slideSize;
                 if (!params.cssWidthAndHeight) {
                     if (parseFloat(slideWidth) > 0) {
-                        _this.slides[i].style.width = slideWidth + 'px';
+                        if (!params.keepWidths) {
+                            _this.slides[i].style.width = slideWidth + 'px';
+                        }
                     }
                     if (parseFloat(slideHeight) > 0) {
                         _this.slides[i].style.height = slideHeight + 'px';
