@@ -1731,24 +1731,29 @@ var Swiper = function (selector, params) {
     /*==================================================
         Swipe Functions
     ====================================================*/
-    _this.swipeNext = function (internal) {
+    _this.swipeNext = function (internal, pageWidthOnly) {
         if (!internal && params.loop) _this.fixLoop();
         if (!internal && params.autoplay) _this.stopAutoplay(true);
         _this.callPlugins('onSwipeNext');
         var currentPosition = _this.getWrapperTranslate();
         var newPosition = currentPosition;
-        if (params.slidesPerView === 'auto') {
-            for (var i = 0; i < _this.snapGrid.length; i++) {
-                if (-currentPosition >= _this.snapGrid[i] && -currentPosition < _this.snapGrid[i + 1]) {
-                    newPosition = -_this.snapGrid[i + 1];
-                    break;
+        if (pageWidthOnly) {
+            newPosition -= $(window).width();
+        } else {
+            if (params.slidesPerView === 'auto') {
+                for (var i = 0; i < _this.snapGrid.length; i++) {
+                    if (-currentPosition >= _this.snapGrid[i] && -currentPosition < _this.snapGrid[i + 1]) {
+                        newPosition = -_this.snapGrid[i + 1];
+                        break;
+                    }
                 }
             }
+            else {
+                var groupSize = slideSize * params.slidesPerGroup;
+                newPosition = -(Math.floor(Math.abs(currentPosition) / Math.floor(groupSize)) * groupSize + groupSize);
+            }
         }
-        else {
-            var groupSize = slideSize * params.slidesPerGroup;
-            newPosition = -(Math.floor(Math.abs(currentPosition) / Math.floor(groupSize)) * groupSize + groupSize);
-        }
+
         if (newPosition < -maxWrapperPosition()) {
             newPosition = -maxWrapperPosition();
         }
@@ -1756,29 +1761,33 @@ var Swiper = function (selector, params) {
         swipeToPosition(newPosition, 'next');
         return true;
     };
-    _this.swipePrev = function (internal) {
+    _this.swipePrev = function (internal, pageWidthOnly) {
         if (!internal && params.loop) _this.fixLoop();
         if (!internal && params.autoplay) _this.stopAutoplay(true);
         _this.callPlugins('onSwipePrev');
 
         var currentPosition = Math.ceil(_this.getWrapperTranslate());
         var newPosition;
-        if (params.slidesPerView === 'auto') {
-            newPosition = 0;
-            for (var i = 1; i < _this.snapGrid.length; i++) {
-                if (-currentPosition === _this.snapGrid[i]) {
-                    newPosition = -_this.snapGrid[i - 1];
-                    break;
-                }
-                if (-currentPosition > _this.snapGrid[i] && -currentPosition < _this.snapGrid[i + 1]) {
-                    newPosition = -_this.snapGrid[i];
-                    break;
+        if (pageWidthOnly) {
+            newPosition = currentPosition + $(window).width();
+        } else {
+            if (params.slidesPerView === 'auto') {
+                newPosition = 0;
+                for (var i = 1; i < _this.snapGrid.length; i++) {
+                    if (-currentPosition === _this.snapGrid[i]) {
+                        newPosition = -_this.snapGrid[i - 1];
+                        break;
+                    }
+                    if (-currentPosition > _this.snapGrid[i] && -currentPosition < _this.snapGrid[i + 1]) {
+                        newPosition = -_this.snapGrid[i];
+                        break;
+                    }
                 }
             }
-        }
-        else {
-            var groupSize = slideSize * params.slidesPerGroup;
-            newPosition = -(Math.ceil(-currentPosition / groupSize) - 1) * groupSize;
+            else {
+                var groupSize = slideSize * params.slidesPerGroup;
+                newPosition = -(Math.ceil(-currentPosition / groupSize) - 1) * groupSize;
+            }
         }
 
         if (newPosition > 0) newPosition = 0;
