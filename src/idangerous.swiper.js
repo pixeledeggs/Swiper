@@ -876,6 +876,8 @@ var Swiper = function (selector, params) {
         return a;
     }
 
+    _this.maxWrapperPosition = maxWrapperPosition;
+
     /*==========================================
         Event Listeners
     ============================================*/
